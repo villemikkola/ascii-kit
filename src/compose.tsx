@@ -110,9 +110,11 @@ function Compose({ input, source }: { input: string; source: Source }) {
 
 function TypeInput({ initial = "" }: { initial?: string }) {
   const { push } = useNavigation();
+  // Opened with text when editing (⌘E), empty when there was nothing to read.
+  const editing = initial.trim() !== "";
   return (
     <Form
-      navigationTitle="Compose · type input"
+      navigationTitle={editing ? "Compose · edit input" : "Compose · type input"}
       actions={
         <ActionPanel>
           <Action.SubmitForm
@@ -125,14 +127,18 @@ function TypeInput({ initial = "" }: { initial?: string }) {
         </ActionPanel>
       }
     >
-      <Form.Description text="Nothing selected or copied. Type or paste what to draw, then ⌘↵." />
-      <Form.TextArea id="input" title="Input" defaultValue={initial} enableMarkdown={false} autoFocus />
       <Form.Description
-        title="Accepts"
-        text={(Object.keys(EXPECTS) as Kind[])
-          .map((k) => `${KIND_TITLES[k]}: ${EXPECTS[k].replace(/`/g, "")}`)
-          .join("\n")}
+        text={
+          editing
+            ? "Edit the input, then ⌘↵ to preview the formats again."
+            : "Nothing selected or copied. Type or paste what to draw, then ⌘↵."
+        }
       />
+      <Form.TextArea id="input" title="Input" defaultValue={initial} enableMarkdown={false} autoFocus />
+      {/* One row per kind: a single description collapses line breaks into one paragraph. */}
+      {(Object.keys(EXPECTS) as Kind[]).map((k) => (
+        <Form.Description key={k} title={KIND_TITLES[k]} text={EXPECTS[k].replace(/`/g, "")} />
+      ))}
     </Form>
   );
 }
