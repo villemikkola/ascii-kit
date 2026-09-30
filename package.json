@@ -4,7 +4,7 @@
   "title": "ASCII Kit",
   "description": "Box-drawing glyphs, diagram templates and a live-preview composer for text diagrams in PRs, Slack and docs.",
   "icon": "icon.png",
-  "author": "ville",
+  "author": "villem",
   "categories": [
     "Productivity",
     "Developer Tools"
