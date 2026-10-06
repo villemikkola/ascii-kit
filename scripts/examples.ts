@@ -1,5 +1,5 @@
 // Prints each Compose format for a sample input: handy for checking alignment in a terminal.
-import { FORMATS } from "../src/lib/formats";
+import { FORMATS } from "../extension/src/lib/formats";
 import { SAMPLES } from "./samples";
 
 const only = process.argv[2];

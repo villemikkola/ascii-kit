@@ -1,5 +1,5 @@
 // Sample inputs per Compose kind, shared by `npm run examples` and `npm run readme`.
-import type { Kind } from "../src/lib/formats";
+import type { Kind } from "../extension/src/lib/formats";
 
 export const SAMPLES: Record<Kind, string> = {
   tree: "src\n  components\n    Button.tsx\n    Card.tsx\n  hooks\n    useSearch.ts\n  index.ts",

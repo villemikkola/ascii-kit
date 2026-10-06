@@ -1,18 +1,25 @@
-// Regenerates the example galleries in README.md from the real generators and data, so they
-// can't drift from what the extension draws. Only the text between `<!-- gen:NAME -->` and
-// `<!-- /gen:NAME -->` markers is rewritten. `--check` exits 1 instead of writing if stale.
+// Regenerates the example galleries in README.md (this repo) and extension/README.md (the Store
+// page) from the real generators and data, so they can't drift from what the extension draws.
+// Only the text between `<!-- gen:NAME -->` and `<!-- /gen:NAME -->` markers is rewritten.
+// `--check` exits 1 instead of writing if either is stale.
 import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { ALL_GLYPHS, GROUPS, Glyph } from "../src/data/glyphs";
-import { TEMPLATES, TEMPLATE_GROUPS } from "../src/data/templates";
-import { renderBanner } from "../src/lib/banner";
-import { EXPECTS, FORMATS, KIND_TITLES, Kind } from "../src/lib/formats";
-import { sideBySide } from "../src/lib/layout";
-import { fence } from "../src/lib/markdown";
-import { displayWidth } from "../src/lib/width";
+import { relative, resolve } from "node:path";
+import { ALL_GLYPHS, GROUPS, Glyph } from "../extension/src/data/glyphs";
+import { TEMPLATES, TEMPLATE_GROUPS } from "../extension/src/data/templates";
+import { renderBanner } from "../extension/src/lib/banner";
+import { EXPECTS, FORMATS, KIND_TITLES, Kind } from "../extension/src/lib/formats";
+import { sideBySide } from "../extension/src/lib/layout";
+import { fence } from "../extension/src/lib/markdown";
+import { displayWidth } from "../extension/src/lib/width";
 import { SAMPLES } from "./samples";
 
-const README = resolve(__dirname, "../README.md");
+const READMES: { path: string; sections: string[] }[] = [
+  {
+    path: resolve(__dirname, "../README.md"),
+    sections: ["hero", "counts", "showcase", "formats", "glyphs", "templates"],
+  },
+  { path: resolve(__dirname, "../extension/README.md"), sections: ["storeCounts", "showcase", "inputs"] },
+];
 const WALL_WIDTH = 76;
 
 const format = (id: string) => {
@@ -59,6 +66,25 @@ const sections: Record<string, () => string> = {
       `**${snippets} snippets**`,
     ].join(" · ");
   },
+
+  // The Store page has no snippet pack: snippets can't ship with an extension.
+  storeCounts: () =>
+    [
+      `**${FORMATS.length} formats** in ${kinds.length} kinds`,
+      `**${ALL_GLYPHS.length} glyphs** in ${GROUPS.length} groups`,
+      `**${TEMPLATES.length} templates** in ${TEMPLATE_GROUPS.length} sections`,
+    ].join(" · "),
+
+  inputs: () =>
+    [
+      "| Kind | Write this | Formats |",
+      "| --- | --- | --- |",
+      ...kinds.map((kind: Kind) => {
+        const formats = FORMATS.filter((f) => f.kind === kind).map((f) => f.title.replace(/^[^·]+·\s*/, ""));
+        const cell = (text: string) => text.replace(/\|/g, "\\|");
+        return `| ${KIND_TITLES[kind]} | ${cell(EXPECTS[kind])} | ${cell(formats.join("; "))} |`;
+      }),
+    ].join("\n"),
 
   showcase: () => SHOWCASE.map((s) => `${s.caption}\n\n${fence(pair(s.input, s.format))}`).join("\n\n"),
 
@@ -127,31 +153,34 @@ const sections: Record<string, () => string> = {
     }).join("\n\n"),
 };
 
-const before = readFileSync(README, "utf8");
-const seen = new Set<string>();
-// A function replacement, never a string one: `$&` and friends in the content would expand.
-const after = before.replace(
-  /(<!-- gen:(\w+) -->)[\s\S]*?(<!-- \/gen:\2 -->)/g,
-  (_match, open: string, name: string, close: string) => {
-    const render = sections[name];
-    if (!render) throw new Error(`README has an unknown section marker: ${name}`);
-    seen.add(name);
-    return `${open}\n${render()}\n${close}`;
-  },
-);
-const missing = Object.keys(sections).filter((name) => !seen.has(name));
-if (missing.length) {
-  console.error(`README.md is missing markers for: ${missing.join(", ")}`);
-  process.exit(1);
-}
-
-if (process.argv.includes("--check")) {
-  if (after !== before) {
-    console.error("README.md is out of date. Run `npm run readme`.");
+let stale = false;
+for (const { path, sections: wanted } of READMES) {
+  const name = relative(resolve(__dirname, ".."), path);
+  const before = readFileSync(path, "utf8");
+  const seen = new Set<string>();
+  // A function replacement, never a string one: `$&` and friends in the content would expand.
+  const after = before.replace(
+    /(<!-- gen:(\w+) -->)[\s\S]*?(<!-- \/gen:\2 -->)/g,
+    (_match, open: string, section: string, close: string) => {
+      if (!wanted.includes(section)) throw new Error(`${name} has an unknown section marker: ${section}`);
+      seen.add(section);
+      return `${open}\n${sections[section]()}\n${close}`;
+    },
+  );
+  const missing = wanted.filter((section) => !seen.has(section));
+  if (missing.length) {
+    console.error(`${name} is missing markers for: ${missing.join(", ")}`);
     process.exit(1);
   }
-  console.log("README.md is up to date.");
-} else {
-  writeFileSync(README, after);
-  console.log(after === before ? "README.md unchanged." : "README.md updated.");
+
+  if (process.argv.includes("--check")) {
+    if (after !== before) {
+      console.error(`${name} is out of date. Run \`npm run readme\`.`);
+      stale = true;
+    } else console.log(`${name} is up to date.`);
+  } else {
+    writeFileSync(path, after);
+    console.log(after === before ? `${name} unchanged.` : `${name} updated.`);
+  }
 }
+if (stale) process.exit(1);

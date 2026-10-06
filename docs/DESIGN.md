@@ -7,7 +7,7 @@ this file covers why it is the way it is, for anyone changing it.
 
 - **Snippets for inline glyphs, the extension for structure.** Only glyphs typed daily get a
   `!` keyword. Everything else is found by meaning in Search Glyphs.
-- **Every generator is a pure function** in `src/lib/`, tested without Raycast. The commands
+- **Every generator is a pure function** in `extension/src/lib/`, tested without Raycast. The commands
   are thin UI over them. Templates call the generators wherever possible, so their alignment
   can't drift.
 - **Display width is measured, never assumed.** `lib/width.ts` counts graphemes: emoji and CJK
@@ -19,9 +19,11 @@ this file covers why it is the way it is, for anyone changing it.
   screen-reader caveat in the preview.
 - **Heavy straight arrows are the default** in templates and generated flows. Outline
   (diagonal) and solid (block) arrows stay in the palette, with a caveat.
-- **The README's galleries are generated.** `npm run readme` renders them from the same
-  generators and data the extension uses, so the examples can't go stale. The source repo's CI
-  (`.github/workflows/ci.yml`) runs `npm run readme -- --check`.
+- **The READMEs' galleries are generated.** `npm run readme` renders them in this README and
+  the Store page (`extension/README.md`) from the same generators and data the extension uses,
+  so the examples can't go stale. CI (`.github/workflows/ci.yml`) runs `npm run readme -- --check`.
+- **Only `extension/` ships to the Store.** `npm run publish` copies the whole folder it runs in,
+  so the README gallery, snippet pack, scripts and these notes live outside it.
 
 ## Learnings
 
@@ -93,18 +95,18 @@ before changing either. It has gone both ways.
 
 The Raycast Store builds extensions from the
 [`raycast/extensions`](https://github.com/raycast/extensions) monorepo. This repo stays the
-source of truth:
+source of truth. In `extension/`:
 
 1. Add an entry at the top of `CHANGELOG.md` (`## [Title] - {PR_MERGE_DATE}`).
-2. `npm run lint && npm test && npm run build`.
+2. `npm run lint && npm test && npm run build`, and `npm run readme -- --check` at the root.
 3. `npm run publish` opens a pull request on `raycast/extensions`, or updates the open one.
    Raycast reviews it, and the Store updates when it's merged.
 
 People can also send fixes straight to the copy in `raycast/extensions`. Pull those back
 with `npx @raycast/api@latest pull-contributions` before the next publish.
 
-Store screenshots live in `metadata/` (PNG, 2000×1250, 3–6 of them, taken with Raycast's
-Window Capture on one background). Images the README links to live in `media/`.
+Store screenshots live in `extension/metadata/` (PNG, 2000×1250, 3–6 of them, taken with Raycast's
+Window Capture on one background). Images the root README links to live in `media/`, never in `extension/`.
 
 ## Open ideas
 

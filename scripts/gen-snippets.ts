@@ -1,7 +1,7 @@
 // Writes snippets/core.json (Raycast → Import Snippets) from the glyphs that have a keyword.
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { ALL_GLYPHS } from "../src/data/glyphs";
+import { ALL_GLYPHS } from "../extension/src/data/glyphs";
 
 const snippets = ALL_GLYPHS.filter((g) => g.keyword).map((g) => ({
   name: `ASCII · ${g.name}`,

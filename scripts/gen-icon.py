@@ -1,4 +1,4 @@
-"""Draws assets/icon.png: a tree glyph (├── └──) on a rounded dark tile. Stdlib only."""
+"""Draws extension/assets/icon.png: a tree glyph (├── └──) on a rounded dark tile. Stdlib only."""
 import struct, zlib, pathlib
 
 S = 512
@@ -34,6 +34,6 @@ def chunk(tag, data):
     return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
 png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", S, S, 8, 6, 0, 0, 0)) \
     + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
-out = pathlib.Path(__file__).resolve().parent.parent / "assets" / "icon.png"
+out = pathlib.Path(__file__).resolve().parent.parent / "extension" / "assets" / "icon.png"
 out.write_bytes(png)
 print(f"Wrote {out}")

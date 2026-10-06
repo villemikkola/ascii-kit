@@ -14,7 +14,15 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            extension/package-lock.json
+      - run: npm ci
+        working-directory: extension
+      - run: npx tsc --noEmit
+        working-directory: extension
+      - run: npm test
+        working-directory: extension
       - run: npm ci
       - run: npx tsc --noEmit
-      - run: npm test
       - run: npm run readme -- --check
