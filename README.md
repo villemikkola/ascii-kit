@@ -72,10 +72,16 @@ faster to generate from a list than to draw by hand.
 
 ## Install
 
-You need macOS and [Raycast](https://www.raycast.com). Installing from source also needs
-[Node.js](https://nodejs.org) 22 or later.
+You need macOS and [Raycast](https://www.raycast.com).
+
+### From the Raycast Store
+
+Install [ASCII Kit](https://raycast.com/villem/ascii-kit) from the Store, or search for it in
+Raycast's Store command. Updates arrive automatically.
 
 ### From source
+
+For working on the extension. This also needs [Node.js](https://nodejs.org) 22 or later.
 
 ```sh
 git clone https://github.com/villemikkola/ascii-kit.git
@@ -84,11 +90,8 @@ npm install && npm run dev
 ```
 
 Once Raycast shows "ASCII Kit", stop the dev server with `⌃C`. The extension stays installed.
-To update later: `git pull`, then `npm install && npm run dev` in `extension/` again.
-
-### From the Raycast Store
-
-Not yet published. Until then, install from source.
+To update later: `git pull`, then `npm install && npm run dev` in `extension/` again. Don't
+keep both: remove the Store copy first, or you'll see every command twice.
 
 ### Snippets
 
