@@ -1,13 +1,14 @@
 {
   "name": "ascii-kit-tools",
   "private": true,
-  "description": "Source-repo tooling for the ASCII Kit Raycast extension in extension/: README gallery, snippet pack, examples, font renders.",
+  "description": "Source-repo tooling for the ASCII Kit Raycast extension in extension/: README gallery, snippet pack, social preview, examples, font renders.",
   "license": "MIT",
   "scripts": {
     "snippets": "tsx scripts/gen-snippets.ts",
     "examples": "tsx scripts/examples.ts",
     "render-fonts": "swift scripts/render-fonts.swift",
-    "readme": "tsx scripts/gen-readme.ts"
+    "readme": "tsx scripts/gen-readme.ts",
+    "social": "tsx scripts/gen-social.ts"
   },
   "devDependencies": {
     "@types/node": "^22.19.17",
